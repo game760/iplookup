@@ -12,13 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/time/rate"
+	"iplookup/iplookup_go/internal/middleware/ratelimit"
 )
 
 // Setup 注册中间件
 func Setup(r *gin.Engine, cfg *config.Config) {
-	// 1. 跨域配置（从配置读取允许的源）
+	// 跨域配置（使用配置文件中的允许源）
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     parseAllowOrigins(cfg.API.AllowedOrigins),
+		AllowOrigins:     cfg.API.AllowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -26,13 +27,29 @@ func Setup(r *gin.Engine, cfg *config.Config) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// 2. 日志和恢复中间件
+	// 限流中间件（使用配置文件中的限流值）
+	rl := ratelimit.NewMiddleware(cfg.API.RateLimit, func(c *gin.Context) string {
+		// 从X-Forwarded-For或RemoteAddr获取客户端IP
+		ip := c.ClientIP()
+		if ip == "" {
+			ip = c.Request.RemoteAddr
+			// 去除端口部分
+			parts := strings.Split(ip, ":")
+			if len(parts) > 0 {
+				ip = parts[0]
+			}
+		}
+		return ip // 使用IP作为限流键
+	})
+	r.Use(rl.Handler())
+
+	// 日志和恢复中间件
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
 	// 3. 速率限制中间件（公共接口）
-	publicLimiter := NewIPRateLimiter(cfg.API.PublicRateLimit)
-	r.Use(ratelimit.NewMiddleware(publicLimiter))
+	// publicLimiter := NewIPRateLimiter(cfg.API.PublicRateLimit)
+	// r.Use(ratelimit.NewMiddleware(publicLimiter))
 }
 
 // 解析允许的源（支持逗号分隔）

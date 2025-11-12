@@ -28,6 +28,13 @@ type Config struct {
 		IPv6Table string `yml:"ipv6_table" yaml:"ipv6_table"` // IPv6数据表名
 	} `yml:"ip_database" yaml:"ip_database"`
 }
+	// 添加API相关配置（解决cfg.API未定义问题）
+	API struct {
+		JWTSecret   string `yml:"jwt_secret" yaml:"jwt_secret"` // JWT密钥
+		RateLimit   int    `yml:"rate_limit" yaml:"rate_limit"` // 每秒限流次数
+		AllowOrigins []string `yml:"allow_origins" yaml:"allow_origins"` // 允许的跨域源
+	} `yml:"api" yaml:"api"`
+}
 
 // Load 从YML/YAML文件加载配置，支持两种标签格式（优先yml）
 func Load(path string) (*Config, error) {
@@ -75,6 +82,12 @@ func Load(path string) (*Config, error) {
 	if cfg.IPDatabase.IPv6Table == "" {
 		cfg.IPDatabase.IPv6Table = "ip2location_db11_ipv6" // IPv6表默认名
 	}
-
+// API配置默认值
+	if cfg.API.RateLimit == 0 {
+		cfg.API.RateLimit = 100 // 默认每秒100次请求
+	}
+	if len(cfg.API.AllowOrigins) == 0 {
+		cfg.API.AllowOrigins = []string{"*"} // 默认允许所有源
+	}
 	return &cfg, nil
 }
