@@ -6,11 +6,11 @@ import (
 	"time"
 	"iplookup/iplookup_go/internal/config"
 	"iplookup/iplookup_go/internal/model"
-
+    "github.com/golang-jwt/jwt"
+    "go.uber.org/ratelimit"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/ratelimit"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8" // 需引入redis依赖（用于分布式限流）
+	"github.com/go-redis/redis/v8"
 	"golang.org/x/time/rate"
 )
 
