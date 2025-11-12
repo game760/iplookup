@@ -1,4 +1,4 @@
-module ip-query-system
+module iplookup_go
 
 go 1.23.0
 
