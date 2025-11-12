@@ -46,7 +46,7 @@ func SuccessResponse(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    0,
 		"message": "success",
-		"Data":    data, // 正确使用函数参数data（小写）
+		"data":    data, // 正确使用函数参数data（小写）
 	}
 }
 
@@ -55,6 +55,6 @@ func ErrorResponse(message string) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    1,
 		"message": message,
-		"Data":    nil, // 错误时无业务数据，设为nil
+		"data":    nil, // 错误时无业务数据，设为nil
 	}
 }

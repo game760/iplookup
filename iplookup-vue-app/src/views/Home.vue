@@ -70,40 +70,34 @@
               
               <!-- 查询结果 -->
               <div v-if="result && !loading" class="animate-slide-up">
-                <h3 class="text-primary mb-4">查询结果</h3>
-                <div class="table-responsive">
-                  <table class="table">
-                    <tbody>
-                      <tr>
-                        <th scope="row" class="w-1/3">IP地址</th>
-                        <td>{{ result.ip }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">国家</th>
-                        <td>{{ result.country || '未知' }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">地区</th>
-                        <td>{{ result.region || '未知' }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">城市</th>
-                        <td>{{ result.city || '未知' }}</td>
-                      </tr>
-                      <template v-if="result.isp">
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">查询结果</h5>
+                    <table class="table">
+                      <tbody>
                         <tr>
-                          <th scope="row">运营商</th>
-                          <td>{{ result.isp }}</td>
+                          <td class="w-25 text-muted">IP地址</td>
+                          <td>{{ result.ip }}</td>
                         </tr>
-                      </template>
-                      <template v-if="result.latitude && result.longitude">
                         <tr>
-                          <th scope="row">坐标</th>
-                          <td>{{ result.latitude }}, {{ result.longitude }}</td>
+                          <td class="text-muted">国家</td>
+                          <td>{{ result.country || '未知' }}</td>
                         </tr>
-                      </template>
-                    </tbody>
-                  </table>
+                        <tr>
+                          <td class="text-muted">地区</td>
+                          <td>{{ result.region || '未知' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">城市</td>
+                          <td>{{ result.city || '未知' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">运营商</td>
+                          <td>{{ result.isp || '未知' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 
                 <div class="text-center mt-4">
@@ -184,20 +178,15 @@ const isValidIP = (ip) => {
   if (ipv4Regex.test(trimmedIp)) {
     return trimmedIp.split('.').every(part => {
       const num = parseInt(part, 10);
-      return num >= 0 && num <= 255 && segment === num.toString();
+      // 修复：使用part而不是未定义的segment变量
+      return num >= 0 && num <= 255 && part === num.toString();
     });
   }
 
-  // IPv6验证
+  // IPv6验证 - 修复重复定义问题
   const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
   const ipv6CompressedRegex = /^(([0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4})?::(([0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4})?$/;
-  
   return ipv6Regex.test(trimmedIp) || ipv6CompressedRegex.test(trimmedIp);
-  };
-
-  // 包含压缩的IPv6验证
-  const ipv6CompressedRegex = /^([0-9a-fA-F]{1,4}:){1,7}:([0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}$/;
-  return ipv6CompressedRegex.test(trimmedIp);
 };
 
 // 保存查询历史
@@ -313,32 +302,14 @@ onMounted(() => {
 .top-decoration {
   height: 6px;
   background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
-  background-size: 200% 100%;
-  animation: gradientShift 8s ease infinite;
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.card {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.card-header {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-}
-
-/* 动画效果 */
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.4s ease-out;
+  animation: slideUp 0.3s ease-out;
 }
 
 @keyframes fadeIn {
@@ -347,23 +318,7 @@ onMounted(() => {
 }
 
 @keyframes slideUp {
-  from { transform: translateY(10px); opacity: 0; }
+  from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
-}
-
-/* 响应式优化 */
-@media (max-width: 768px) {
-  .card-body {
-    padding: 40px 20px !important;
-  }
-  
-  h2 {
-    font-size: 1.5rem !important;
-  }
-  
-  .input-group {
-    flex-direction: column;
-    gap: 10px;
-  }
 }
 </style>
