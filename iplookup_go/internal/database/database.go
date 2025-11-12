@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql" // MySQL驱动
-	"ip-query-system/internal/config"
+	_ "github.com/go-sql-driver/mysql"
+	"iplookup/iplookup_go/internal/config"
 )
 
 // DB 数据库连接实例

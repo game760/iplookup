@@ -2,7 +2,7 @@ package ipdb
 
 import (
 
-	"ip-query-system/internal/model" // 导入model包（必须）
+	"iplookup/iplookup_go/internal/model" // 导入model包（必须）
 
 )
 

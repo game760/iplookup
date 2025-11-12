@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"time"
-	"iplookup_app/ip-query-system/internal/config"
+	"iplookup/iplookup_go/internal/config"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

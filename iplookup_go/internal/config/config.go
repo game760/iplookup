@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 
-	"gopkg.in/yaml.v3" // 修正为标准YAML包（原yml.v3为错误依赖）
+	"gopkg.in/yaml.v3"
 )
 
 // Config 全局配置结构体

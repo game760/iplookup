@@ -1,9 +1,9 @@
 package api
 
 import (
-	"iplookup_app/ip-query-system/internal/config"
-	"iplookup_app/ip-query-system/internal/database"
-	"iplookup_app/ip-query-system/internal/ipdb"
+	"iplookup/iplookup_go/internal/config"
+	"iplookup/iplookup_go/internal/database"
+	"iplookup/iplookup_go/internal/ipdb"
 
 	"github.com/gin-gonic/gin"
 )

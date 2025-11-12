@@ -2,8 +2,8 @@ package api
 
 import (
 	"net/http"
-	"iplookup_app/ip-query-system/internal/ipdb"
-	"iplookup_app/ip-query-system/internal/model"
+	"iplookup/iplookup_go/internal/ipdb"
+	"iplookup/iplookup_go/internal/model"
 
 	"github.com/gin-gonic/gin"
 )

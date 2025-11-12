@@ -10,11 +10,11 @@ import (
 	"syscall"
 	"time"
 
-	"ip-query-system/internal/api"
-	"ip-query-system/internal/config"
-	"ip-query-system/internal/database"
-	"ip-query-system/internal/ipdb"
-	"ip-query-system/internal/middleware"
+	"iplookup/iplookup_go/internal/api"
+	"iplookup/iplookup_go/internal/config"
+	"iplookup/iplookup_go/internal/database"
+	"iplookup/iplookup_go/internal/ipdb"
+	"iplookup/iplookup_go/internal/middleware"
 )
 
 func main() {

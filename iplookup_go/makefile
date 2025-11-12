@@ -1,6 +1,6 @@
 # 基础配置
-BINARY_LINUX = ip-query-service  # Linux 可执行文件名（无后缀）
-BINARY_WIN = ip-query-service.exe  # Windows 可执行文件名（带 .exe 后缀）
+BINARY_LINUX = iplookup_linux  # Linux 可执行文件名（无后缀）
+BINARY_WIN = iplookup_win.exe  # Windows 可执行文件名（带 .exe 后缀）
 GOARCH ?= amd64  # 架构（默认 64位）
 
 # 默认目标：同时编译 Linux 和 Windows 版本
