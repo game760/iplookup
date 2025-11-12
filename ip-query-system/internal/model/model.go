@@ -9,7 +9,7 @@ type IPQueryRequest struct {
 type IPQueryResponse struct {
 	Code    int         `json:"code"`   // 0：成功 非0：错误
 	Message string      `json:"message"` // 提示信息
-	Data    *IPLocation `json:"data"`   // 业务数据（IP地理位置信息）
+	Data    interface{} `json:"data"`   // 业务数据（IP地理位置信息）
 }
 
 // IPLocation IP地理位置信息
