@@ -30,30 +30,39 @@ func IPQueryHandler(ipDB *ipdb.IPDB) gin.HandlerFunc {
 			return
 		}
 
-		record, ipType, err := ipDB.Query(req.IP)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, model.IPQueryResponse{
-				Code:    2,
-				Message: "查询失败: " + err.Error(),
-			})
+		resp := ipDB.Query(req.IP)
+		if resp.Code != 0 {
+			c.JSON(http.StatusBadRequest, resp) // 直接返回查询失败的响应
 			return
+			}
 		}
 
-		c.JSON(http.StatusOK, model.IPQueryResponse{
-			Code:    0,
-			Message: "查询成功",
-			Data: &model.IPLocation{
-				IP:        req.IP,
-				Type:      ipType,
-				Country:   record.CountryName,
-				Region:    record.RegionName,
-				City:      record.CityName,
-				Latitude:  record.Latitude,
-				Longitude: record.Longitude,
-			},
-		})
-	}
+// 从响应数据中提取IPLocation
+location, ok := resp.Data.(*model.IPLocation)
+if !ok {
+    c.JSON(http.StatusInternalServerError, model.IPQueryResponse{
+        Code:    2,
+        Message: "查询结果格式错误",
+    })
+    return
 }
+
+// 构建成功响应（使用location中的数据）
+c.JSON(http.StatusOK, model.IPQueryResponse{
+    Code:    0,
+    Message: "查询成功",
+    Data: &model.IPLocation{
+        IP:        req.IP,
+        Type:      location.Type,       // 从location获取IP类型
+        Country:   location.Country,    // 从location获取国家
+        Region:    location.Region,     // 从location获取地区
+        City:      location.City,       // 从location获取城市
+        Latitude:  location.Latitude,
+        Longitude: location.Longitude,
+    },
+})
+	}
+
 
 func (h *Handler) QueryIP(c *gin.Context) {
 	ip := c.Query("ip")
@@ -62,53 +71,70 @@ func (h *Handler) QueryIP(c *gin.Context) {
 		return
 	}
 
-	record, ipType, err := h.ipDB.Query(ip)
-	if err != nil {
-		if err.Error() == "无效的IP地址格式" || err.Error() == "不支持的IP地址类型" {
-			c.JSON(http.StatusBadRequest, model.ErrorResponse(err.Error()))
-		} else {
-			c.JSON(http.StatusInternalServerError, model.ErrorResponse("查询失败: "+err.Error()))
-		}
-		return
-	}
-
-	// 构建响应（注意：根据数据库结构，移除了原有的ISP/ASN等不存在的字段）
-	response := model.SuccessResponse(model.IPInfo{
-		IP:         ip,
-		Type:       ipType,
-		Country:    record.CountryName,
-		Region:     record.RegionName,
-		City:       record.CityName,
-		Latitude:   record.Latitude,
-		Longitude:  record.Longitude,
-		ZipCode:    record.ZipCode,
-		Timezone:   record.TimeZone,
-	})
-
-	c.JSON(http.StatusOK, response)
+	// 原错误代码
+record, ipType, err := h.ipDB.Query(ip)
+if err != nil {
+    // ...
 }
 
+// 修复后代码
+resp := h.ipDB.Query(ip)
+if resp.Code != 0 {
+    c.JSON(http.StatusBadRequest, model.ErrorResponse(resp.Message))
+    return
+}
+
+// 从响应数据中提取IPLocation
+location, ok := resp.Data.(*model.IPLocation)
+if !ok {
+    c.JSON(http.StatusInternalServerError, model.ErrorResponse("查询结果格式错误"))
+    return
+}
+
+// 构建详细信息响应
+response := model.SuccessResponse(model.IPInfo{
+    IP:         ip,
+    Type:       location.Type,       // 从location获取IP类型
+    Country:    location.Country,    // 从location获取国家
+    Region:     location.Region,     // 从location获取地区
+    City:       location.City,       // 从location获取城市
+    Latitude:   location.Latitude,
+    Longitude:  location.Longitude,
+    ZipCode:    "", // 若有需要可从IP库补充
+    Timezone:   "", // 若有需要可从IP库补充
+})
+
+c.JSON(http.StatusOK, response)
 // GetMyIP 查询本机IP
 func (h *Handler) GetMyIP(c *gin.Context) {
 	ip := c.ClientIP()
 	
-	record, ipType, err := h.ipDB.Query(ip)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, model.ErrorResponse("查询失败: "+err.Error()))
-		return
-	}
+// 修复后代码
+resp := h.ipDB.Query(ip)
+if resp.Code != 0 {
+    c.JSON(http.StatusInternalServerError, model.ErrorResponse(resp.Message))
+    return
+}
 
-	response := model.SuccessResponse(model.IPInfo{
-		IP:         ip,
-		Type:       ipType,
-		Country:    record.CountryName,
-		Region:     record.RegionName,
-		City:       record.CityName,
-		Latitude:   record.Latitude,
-		Longitude:  record.Longitude,
-		ZipCode:    record.ZipCode,
-		Timezone:   record.TimeZone,
-	})
+// 从响应数据中提取IPLocation
+location, ok := resp.Data.(*model.IPLocation)
+if !ok {
+    c.JSON(http.StatusInternalServerError, model.ErrorResponse("查询结果格式错误"))
+    return
+}
 
-	c.JSON(http.StatusOK, response)
+// 构建本机IP信息响应
+response := model.SuccessResponse(model.IPInfo{
+    IP:         ip,
+    Type:       location.Type,       // 从location获取IP类型
+    Country:    location.Country,    // 从location获取国家
+    Region:     location.Region,     // 从location获取地区
+    City:       location.City,       // 从location获取城市
+    Latitude:   location.Latitude,
+    Longitude:  location.Longitude,
+    ZipCode:    "", // 若有需要可从IP库补充
+    Timezone:   "", // 若有需要可从IP库补充
+})
+
+c.JSON(http.StatusOK, response)
 }
