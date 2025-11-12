@@ -1,4 +1,4 @@
- go mod tidy
+go mod tidy
  
  - 编译
  ``` make linux或make build-linux ```
