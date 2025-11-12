@@ -2,37 +2,35 @@ package config
 
 import (
 	"os"
-
 	"gopkg.in/yaml.v3"
 )
 
 // Config 全局配置结构体
-// 标签同时支持 yml 和 yaml，解析时优先使用 yml 标签（yaml.v3会优先匹配第一个有效标签）
 type Config struct {
 	Server struct {
-		Port         string `yml:"port" yaml:"port"`         // 服务器端口
-		ReadTimeout  int    `yml:"read_timeout" yaml:"read_timeout"` // 读取超时（秒）
-		WriteTimeout int    `yml:"write_timeout" yaml:"write_timeout"` // 写入超时（秒）
+		Port         string `yml:"port" yaml:"port"`
+		ReadTimeout  int    `yml:"read_timeout" yaml:"read_timeout"`
+		WriteTimeout int    `yml:"write_timeout" yaml:"write_timeout"`
 	} `yml:"server" yaml:"server"`
 
 	Database struct {
-		Host     string `yml:"host" yaml:"host"`     // MySQL地址
-		Port     string `yml:"port" yaml:"port"`     // MySQL端口
-		User     string `yml:"user" yaml:"user"`     // MySQL用户
-		Password string `yml:"password" yaml:"password"` // MySQL密码
-		DBName   string `yml:"db_name" yaml:"db_name"`   // 数据库名（默认ip2location）
+		Host     string `yml:"host" yaml:"host"`
+		Port     string `yml:"port" yaml:"port"`
+		User     string `yml:"user" yaml:"user"`
+		Password string `yml:"password" yaml:"password"`
+		DBName   string `yml:"db_name" yaml:"db_name"`
 	} `yml:"database" yaml:"database"`
 
 	IPDatabase struct {
-		IPv4Table string `yml:"ipv4_table" yaml:"ipv4_table"` // IPv4数据表名
-		IPv6Table string `yml:"ipv6_table" yaml:"ipv6_table"` // IPv6数据表名
+		IPv4Table string `yml:"ipv4_table" yaml:"ipv4_table"`
+		IPv6Table string `yml:"ipv6_table" yaml:"ipv6_table"`
 	} `yml:"ip_database" yaml:"ip_database"`
 }
 	// 添加API相关配置（解决cfg.API未定义问题）
 	API struct {
-		JWTSecret   string `yml:"jwt_secret" yaml:"jwt_secret"` // JWT密钥
-		RateLimit   int    `yml:"rate_limit" yaml:"rate_limit"` // 每秒限流次数
-		AllowOrigins []string `yml:"allow_origins" yaml:"allow_origins"` // 允许的跨域源
+		JWTSecret   string `yml:"jwt_secret" yaml:"jwt_secret"`
+		RateLimit   int    `yml:"rate_limit" yaml:"rate_limit"`
+		AllowOrigins []string `yml:"allow_origins" yaml:"allow_origins"`
 	} `yml:"api" yaml:"api"`
 }
 
@@ -41,53 +39,53 @@ func Load(path string) (*Config, error) {
 	// 读取配置文件
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err // 错误包含文件读取失败信息（如文件不存在）
+		return nil, err
 	}
 
 	var cfg Config
 	// 解析YAML内容，yaml.v3会优先识别结构体中的`yml`标签（若存在），同时兼容`yaml`标签
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, err // 错误包含解析失败信息（如格式错误）
+		return nil, err
 	}
 
 	// 设置完整默认值（避免空值导致后续业务错误）
 	if cfg.Server.Port == "" {
-		cfg.Server.Port = "8080" // 默认服务器端口
+		cfg.Server.Port = "8080"
 	}
 	if cfg.Server.ReadTimeout == 0 {
-		cfg.Server.ReadTimeout = 30 // 默认读取超时30秒
+		cfg.Server.ReadTimeout = 30
 	}
 	if cfg.Server.WriteTimeout == 0 {
-		cfg.Server.WriteTimeout = 30 // 默认写入超时30秒
+		cfg.Server.WriteTimeout = 30
 	}
 
 	if cfg.Database.Host == "" {
-		cfg.Database.Host = "localhost" // 默认MySQL主机
+		cfg.Database.Host = "localhost"
 	}
 	if cfg.Database.Port == "" {
-		cfg.Database.Port = "3306" // 默认MySQL端口
+		cfg.Database.Port = "3306"
 	}
 	if cfg.Database.User == "" {
-		cfg.Database.User = "root" // 默认MySQL用户（可根据实际场景调整）
+		cfg.Database.User = "root"
 	}
 	// 密码默认空（通常由用户在配置文件中指定，不强制默认值）
 
 	if cfg.Database.DBName == "" {
-		cfg.Database.DBName = "ip2location" // 数据库名默认值
+		cfg.Database.DBName = "ip2location"
 	}
 
 	if cfg.IPDatabase.IPv4Table == "" {
-		cfg.IPDatabase.IPv4Table = "ip2location_db11" // IPv4表默认名
+		cfg.IPDatabase.IPv4Table = "ip2location_db11"
 	}
 	if cfg.IPDatabase.IPv6Table == "" {
-		cfg.IPDatabase.IPv6Table = "ip2location_db11_ipv6" // IPv6表默认名
+		cfg.IPDatabase.IPv6Table = "ip2location_db11_ipv6"
 	}
 // API配置默认值
 	if cfg.API.RateLimit == 0 {
-		cfg.API.RateLimit = 100 // 默认每秒100次请求
+		cfg.API.RateLimit = 100
 	}
 	if len(cfg.API.AllowOrigins) == 0 {
-		cfg.API.AllowOrigins = []string{"*"} // 默认允许所有源
+		cfg.API.AllowOrigins = []string{"*"}
 	}
 	return &cfg, nil
 }

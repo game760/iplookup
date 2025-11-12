@@ -47,16 +47,10 @@ func (m *Middleware) getLimiter(key string) *rate.Limiter {
 	return limiter
 }
 
-// Handler 实现gin.HandlerFunc接口
-func (m *Middleware) Handler() gin.HandlerFunc {
+// 实现基于令牌桶的限流中间件（使用time包）
+func RateLimiter(rps int) gin.HandlerFunc {
+	limiter := rate.NewLimiter(rate.Limit(rps), rps*2) // 每秒rps个令牌，桶容量2*rps
 	return func(c *gin.Context) {
-		key := m.keyFunc(c)
-		if key == "" {
-			c.Next()
-			return
-		}
-
-		limiter := m.getLimiter(key)
 		if !limiter.Allow() {
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"code":    429,
@@ -65,7 +59,6 @@ func (m *Middleware) Handler() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
 		c.Next()
 	}
 }
