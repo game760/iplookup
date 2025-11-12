@@ -1,22 +1,25 @@
 package ipdb
 
 import (
-
-	"iplookup/iplookup_go/internal/model" // 导入model包（必须）
+	"iplookup/iplookup_go/internal/config"
+	"iplookup/iplookup_go/internal/model"
 
 )
 
 // 假设IP数据库查询的核心逻辑
 type IPDB struct {
-
+	db     *database.DB  // 数据库连接
+	cfg    *config.Config // 配置信息
 	DBPath string
 }
 
 // NewIPDB 初始化IP数据库实例
-func NewIPDB(dbPath string) *IPDB {
+func init(db *database.DB, cfg *config.Config) (*IPDB, error) {
 	return &IPDB{
-		DBPath: dbPath,
-	}
+		db:     db,
+		cfg:    cfg,
+		DBPath: cfg.IPDatabase.IPv4Table,
+	}, nil
 }
 
 // Query 查询IP地理位置信息
