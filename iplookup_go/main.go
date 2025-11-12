@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// 初始化MySQL数据库（同时用于IP查询）
-	db, err := database.Init(cfg)
+	ipDB, err := ipdb.Init(db, cfg)
 	if err != nil {
 		log.Fatalf("初始化MySQL失败: %v", err)
 	}
