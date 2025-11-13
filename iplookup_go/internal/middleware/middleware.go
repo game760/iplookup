@@ -8,7 +8,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
-	"iplookup/iplookup_go/internal/middleware/ratelimit"
 )
 
 // Setup 注册中间件
