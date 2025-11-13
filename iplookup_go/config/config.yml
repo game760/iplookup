@@ -15,11 +15,13 @@ api:
   prefix: "/api/v1"
   allowed_origins: "*"
 
-ip_database:
-  ipv4_db: "./ipdata/ipv4.xdb"
-  ipv6_db: "./ipdata/ipv6.xdb"
-  v4Version: "xdb.IPv4"
-  v6Version: "xdb.IPv6"
+ipv4database:
+  dbpath: "./ipdata/ipv4.xdb"
+  version: "xdb.IPv4"
+  
+ipv6database:
+  dbpath: "./ipdata/ipv6.xdb"
+  version: "xdb.IPv6"
 
 
 # 用户配置
