@@ -21,6 +21,7 @@ func NewRouter(cfg *config.Config, ipDB *ipdb.IPDB) *gin.Engine {
 		v1.GET("/ip/query/ipv6", handler.QueryIPv6)  // IPv6查询
 		v1.GET("/ip/query", handler.QueryIP)         // 自动识别IP类型查询
 		v1.GET("/ip/my", handler.GetMyIP)            // 本机IP查询
+		v1.GET("/ip/db/version", handler.GetDBVersion)  // 数据库版本查询
 	}
 
 	return r

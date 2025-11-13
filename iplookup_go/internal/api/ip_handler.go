@@ -13,6 +13,12 @@ type Handler struct {
 	ipDB *ipdb.IPDB
 }
 
+// GetDBVersion 获取数据库版本信息
+func (h *Handler) GetDBVersion(c *gin.Context) {
+	versions := h.ipDB.GetDatabaseVersion()
+	c.JSON(http.StatusOK, model.SuccessResponse(versions))
+}
+
 // NewHandler 创建处理器实例
 func NewHandler(ipDB *ipdb.IPDB) *Handler {
 	return &Handler{ipDB: ipDB}
