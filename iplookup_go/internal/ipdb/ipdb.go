@@ -4,8 +4,6 @@ import (
 	"errors"
 	"net"
 	"strconv"
-	"strings"
-
 	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
 	"iplookup/iplookup_go/internal/config"
 	"iplookup/iplookup_go/internal/model"
@@ -19,22 +17,22 @@ type IPDB struct {
 
 // Init 初始化IPv4和IPv6数据库
 func Init(cfg *config.Config) (*IPDB, error) {
-	// 加载IPv4数据库
-	v4Data, err := xdb.LoadContentFromFile(cfg.IPDatabase.IPv4DB)
+	// 加载IPv4数据库（注意返回值变更）
+	v4Version, v4Data, err := xdb.LoadContentFromFile(cfg.IPDatabase.IPv4DB)
 	if err != nil {
 		return nil, errors.New("无法加载IPv4数据库: " + err.Error())
 	}
-	v4Searcher, err := xdb.NewWithBuffer(v4Data)
+	v4Searcher, err := xdb.NewWithBuffer(v4Version, v4Data) // 传入版本和数据
 	if err != nil {
 		return nil, errors.New("初始化IPv4查询器失败: " + err.Error())
 	}
 
-	// 加载IPv6数据库
-	v6Data, err := xdb.LoadContentFromFile(cfg.IPDatabase.IPv6DB)
+	// 加载IPv6数据库（注意返回值变更）
+	v6Version, v6Data, err := xdb.LoadContentFromFile(cfg.IPDatabase.IPv6DB)
 	if err != nil {
 		return nil, errors.New("无法加载IPv6数据库: " + err.Error())
 	}
-	v6Searcher, err := xdb.NewWithBuffer(v6Data)
+	v6Searcher, err := xdb.NewWithBuffer(v6Version, v6Data) // 传入版本和数据
 	if err != nil {
 		return nil, errors.New("初始化IPv6查询器失败: " + err.Error())
 	}
@@ -45,14 +43,10 @@ func Init(cfg *config.Config) (*IPDB, error) {
 	}, nil
 }
 
-// Close 关闭数据库连接
+// Close 关闭数据库连接（修复无返回值问题）
 func (ipdb *IPDB) Close() error {
-	if err := ipdb.v4db.Close(); err != nil {
-		return err
-	}
-	if err := ipdb.v6db.Close(); err != nil {
-		return err
-	}
+	ipdb.v4db.Close() // 无返回值，直接调用
+	ipdb.v6db.Close() // 无返回值，直接调用
 	return nil
 }
 

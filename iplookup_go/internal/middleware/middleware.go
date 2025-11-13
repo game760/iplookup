@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"net/http"
-	"strings"
 	"time"
 	"iplookup/iplookup_go/internal/config"
 	"github.com/gin-contrib/cors"
